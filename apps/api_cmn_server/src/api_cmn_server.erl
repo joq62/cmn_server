@@ -11,6 +11,21 @@
 -behaviour(gen_server).
 
 %% API
+
+-export([
+	 %% git related
+	 git_update_repo/1,
+	 git_clone/1, 
+	 git_delete/1,
+	 git_is_repo_updated/1,
+	 
+	 %% vm related service
+	 vm_get_node/1,
+	 vm_check_started/1,
+	 vm_check_stopped/1
+	 
+	]).
+ 
 -export([
 	 ping/0,
 	 start_link/0
@@ -30,11 +45,75 @@
 
 %%--------------------------------------------------------------------
 %% @doc
+%% git_update_repo
+%% @end
+%%--------------------------------------------------------------------
+-spec git_update_repo(RepoDir::string()) ->  {ok,Info::term()} | {error,Reason::term()}.
+git_update_repo(RepoDir) ->
+    gen_server:call(?SERVER,{git_update_repo,RepoDir},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% git_update_repo
+%% @end
+%%--------------------------------------------------------------------
+-spec git_clone(GitUrl::string()) -> ok | {error,Reason::term()}.
+git_clone(GitUrl) ->
+    gen_server:call(?SERVER,{git_clone,GitUrl},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% git_update_repo
+%% @end
+%%--------------------------------------------------------------------
+-spec git_delete(RepoDir::string()) -> ok | {error,Reason::term()} .
+git_delete(RepoDir) ->
+    gen_server:call(?SERVER,{git_delete_repo,RepoDir},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% git_update_repo
+%% @end
+%%--------------------------------------------------------------------
+-spec git_is_repo_updated(RepoDir::string()) -> true | false | {error,Reason::term()} .
+git_is_repo_updated(RepoDir) ->
+    gen_server:call(?SERVER,{git_is_repo_updated,RepoDir},infinity).
+
+
+
+%%--------------------------------------------------------------------
+%% @doc
+%% vm_get_node
+%% @end
+%%--------------------------------------------------------------------
+-spec vm_get_node(NodeName::string()) -> pong.
+vm_get_node(NodeName) ->
+    gen_server:call(?SERVER,{vm_get_node,NodeName},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  vm_check_started
+%% @end
+%%--------------------------------------------------------------------
+-spec vm_check_started(Node::atom()) -> true | false.
+vm_check_started(Node) ->
+    gen_server:call(?SERVER,{vm_check_started,Node},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  vm_check_stopped
+%% @end
+%%--------------------------------------------------------------------
+-spec vm_check_stopped(Node::atom()) -> true | false.
+vm_check_stopped(Node) ->
+    gen_server:call(?SERVER,{vm_check_stopped,Node},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
 %% Ping
 %% @end
 %%--------------------------------------------------------------------
 -spec ping() -> pong.
-
 ping() ->
     gen_server:call(?SERVER,{ping},infinity).
 
@@ -87,8 +166,39 @@ init([]) ->
 	  {stop, Reason :: term(), Reply :: term(), NewState :: term()} |
 	  {stop, Reason :: term(), NewState :: term()}.
 
+%%------------------- git
+handle_call({git_update_repo,RepoDir}, _From, State) ->
+    Reply=lib_git:update_repo(RepoDir),
+    {reply, Reply, State};
+
+handle_call({git_clone,GitUrl}, _From, State) ->
+    Reply=lib_git:clone(GitUrl),
+    {reply, Reply, State};
+
+handle_call({git_delete_repo,RepoDir}, _From, State) ->
+    Reply=lib_git:delete(RepoDir),
+    {reply, Reply, State};
+
+handle_call({git_is_repo_updated,RepoDir}, _From, State) ->
+    Reply=lib_git:is_repo_updated(RepoDir),
+    {reply, Reply, State};
+
+%%------------------ vm
+handle_call({vm_get_node,NodeName}, _From, State) ->
+    Reply=lib_vm:get_node(NodeName),
+    {reply, Reply, State};
+
+handle_call({vm_check_started,Node}, _From, State) ->
+    Reply=lib_vm:check_started(Node),
+    {reply, Reply, State};
+
+handle_call({vm_check_stopped,Node}, _From, State) ->
+    Reply=lib_vm:check_stopped(Node),
+    {reply, Reply, State};
+
+%%---------------  admin
 handle_call({ping}, _From, State) ->
-    Reply=sd:call(cmn_server,{ping},5000),
+    Reply=cmn_server:ping(),
     {reply, Reply, State};
 
 handle_call(Request, _From, State) ->
