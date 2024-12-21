@@ -1,0 +1,15 @@
+{application, cmn_server,
+ [{description, "Support for common functions"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {cmn_server_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["Apache-2.0"]},
+  {links, []}
+ ]}.

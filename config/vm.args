@@ -1,0 +1,6 @@
+-sname cmn_server
+
+-setcookie cmn_server_cookie
+
++K true
++A30
