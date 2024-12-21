@@ -73,8 +73,6 @@ start_link() ->
 	  ignore.
 init([]) ->
     process_flag(trap_exit, true),
-    MyPid=self(),
-    yes=global:register_name(common,MyPid),
     {ok, #state{}}.
 
 %%--------------------------------------------------------------------

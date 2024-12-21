@@ -35,10 +35,38 @@ start()->
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
+-define(GitUrl,"https://github.com/joq62/cmn_server.git").
+-define(GitUrlNotExists,"https://github.com/joq62/url_not_exists.git").
+
+-define(RepoDir,"cmn_server").
+-define(RepoDirNotExists,"not_exists").
+
 git_test()->    
     io:format("Start ~p~n",[{?MODULE,?FUNCTION_NAME,?LINE}]),
    
+    file:del_dir_r(?RepoDir),
+    %% repo doesnt exists
+    {error,["RepoDir doesnt exists, need to clone","cmn_server"]}=lib_git:is_repo_updated(?RepoDir),
+    {error,["Dir eexists ","cmn_server"]}=lib_git:delete(?RepoDir),
+    {error,["Dir eexists ","cmn_server"]}=lib_git:update_repo(?RepoDir),
+
+    {error,["RepoDir doesnt exists, need to clone","not_exists"]}=lib_git:is_repo_updated(?RepoDirNotExists),
+    {error,["Dir eexists ","not_exists"]}=lib_git:delete(?RepoDirNotExists),
+    {error,["Dir eexists ","not_exists"]}=lib_git:update_repo(?RepoDirNotExists),
     
+    %% Clone 
+    {error,["Failed to clone ","https://github.com/joq62/url_not_exists.git",
+	    "fatal: could not read Username for 'https://github.com': No such device or address\n"]}=lib_git:clone(?GitUrlNotExists),
+    ok=lib_git:clone(?GitUrl),
+    true=lib_git:is_repo_updated(?RepoDir),
+    {error,["Allready updated ","cmn_server"]}=lib_git:update_repo(?RepoDir),
+    ok=lib_git:delete(?RepoDir),
+    {error,["RepoDir doesnt exists, need to clone","cmn_server"]}=lib_git:is_repo_updated(?RepoDir),
+    
+    
+    
+    
+    %%
 
 
     ok.

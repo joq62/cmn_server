@@ -34,7 +34,7 @@
 is_repo_updated(RepoDir)->
     case filelib:is_dir(RepoDir) of
 	false->
-	    {error,["RepoDir doesnt exists, need to clone"]};
+	    {error,["RepoDir doesnt exists, need to clone",RepoDir]};
 	true->
 	    case is_up_to_date(RepoDir) of
 		{error,Reason}->
@@ -66,12 +66,12 @@ update_repo(RepoDir)->
 %% 
 %% @end
 %%--------------------------------------------------------------------
-clone(RepoGit)->
-    case os:cmd("git clone -q "++RepoGit) of
+clone(GitUrl)->
+    case os:cmd("git clone -q "++GitUrl) of
 	[]->
 	    ok;
 	Error->
-	    {error,["Failed to clone ",RepoGit,Error]}
+	    {error,["Failed to clone ",GitUrl,Error]}
     end.
 
 %%--------------------------------------------------------------------
@@ -80,7 +80,12 @@ clone(RepoGit)->
 %% @end
 %%--------------------------------------------------------------------
 delete(RepoDir)->
-    file:del_dir_r(RepoDir).
+    case file:del_dir_r(RepoDir) of
+	{error,enoent}->
+	    {error,["Dir eexists ",RepoDir]};
+	ok->
+	    ok
+    end.
 
 
 %%%===================================================================
@@ -98,7 +103,7 @@ fetch_merge(LocalRepo)->
 		   Info=os:cmd("git -C "++LocalRepo++" "++"merge  "),
 		   {ok,Info};
 	       true->
-		   {error,["Already updated ",LocalRepo]}
+		   {error,["Allready updated ",LocalRepo]}
 	   end,
     Result.
 
