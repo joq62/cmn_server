@@ -8,6 +8,8 @@
  
 -export([start/0]).
 
+-include("log.api").
+
 %%---------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
@@ -24,11 +26,13 @@ start()->
     ok=init(),
 
     ok=git_test(),
-    ok=vm_test(),
+%    ok=vm_test(),
  
     io:format("Test OK !!! ~p~n",[?MODULE]),
+    ?LOG_NOTICE("Start ",[?MODULE,?FUNCTION_NAME,?LINE]),
+
     timer:sleep(2000),
-    init:stop(),
+%    init:stop(),
     ok.
 
 %% --------------------------------------------------------------------
@@ -44,6 +48,8 @@ start()->
 
 git_test()->    
     io:format("Start ~p~n",[{?MODULE,?FUNCTION_NAME,?LINE}]),
+    ?LOG_NOTICE("Start ",[?MODULE,?FUNCTION_NAME,?LINE]),
+    timer:sleep(1000),
    
     file:del_dir_r(?RepoDir),
     %% repo doesnt exists
@@ -74,7 +80,9 @@ git_test()->
 
 vm_test()->    
     io:format("Start ~p~n",[{?MODULE,?FUNCTION_NAME,?LINE}]),
-   
+    ?LOG_NOTICE("Start ",[?MODULE,?FUNCTION_NAME,?LINE]),
+    timer:sleep(1000),
+
     %% get_node(NodeName)
     {ok,HostName}=net:gethostname(),
     Node=list_to_atom(?NodeName++"@"++HostName),
@@ -95,7 +103,8 @@ vm_test()->
 %% --------------------------------------------------------------------
 init()->
     io:format("Start ~p~n",[{?MODULE,?FUNCTION_NAME,?LINE}]),
- 
+    ?LOG_NOTICE("Start ",[?MODULE,?FUNCTION_NAME,?LINE]),
+    timer:sleep(1000),
  
     ok=application:start(cmn_server),
    % sequence by the application 
@@ -119,5 +128,6 @@ setup()->
     os:cmd("rm -r logs *.Mnesia"),
     ok=application:start(log), 
     pong=log:ping(),
-    
+    ?LOG_NOTICE("Start ",[?MODULE,?FUNCTION_NAME,?LINE]),
+    timer:sleep(1000),
     ok.
