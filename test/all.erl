@@ -23,16 +23,16 @@
 start()->
    
     ok=setup(),
-    ok=init(),
+%    ok=init(),
 
     ok=git_test(),
-%    ok=vm_test(),
+    ok=vm_test(),
  
     io:format("Test OK !!! ~p~n",[?MODULE]),
     ?LOG_NOTICE("Start ",[?MODULE,?FUNCTION_NAME,?LINE]),
 
     timer:sleep(2000),
-%    init:stop(),
+    init:stop(),
     ok.
 
 %% --------------------------------------------------------------------
@@ -128,6 +128,10 @@ setup()->
     os:cmd("rm -r logs *.Mnesia"),
     ok=application:start(log), 
     pong=log:ping(),
+    ok=application:start(cmn_server), 
+    pong=cmn_server:ping(),
+    pong=api_cmn_server:ping(),
+    
     ?LOG_NOTICE("Start ",[?MODULE,?FUNCTION_NAME,?LINE]),
     timer:sleep(1000),
     ok.

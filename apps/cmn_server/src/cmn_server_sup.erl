@@ -30,6 +30,8 @@ init([]) ->
                  intensity => 0,
                  period => 1},
     ChildSpecs = [
+		  #{id => api_cmn_server,       
+		    start => {api_cmn_server,start_link,[]}},
 		  #{id => cmn_server,       
 		    start => {cmn_server,start_link,[]}}
 		 ],
