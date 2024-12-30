@@ -6,13 +6,16 @@
 %%% @end
 %%% Created : 21 Dec 2024 by c50 <joq62@c50>
 %%%-------------------------------------------------------------------
--module(api_cmn_server).
+-module(cmn_server).
 
 -behaviour(gen_server).
 
+
+-include("log.api").
 %% API
 
 -export([
+
 	 %% git related
 	 git_update_repo/1,
 	 git_clone/1, 
@@ -22,10 +25,9 @@
 	 %% vm related service
 	 vm_get_node/1,
 	 vm_check_started/1,
-	 vm_check_stopped/1
-	 
-	]).
- 
+	 vm_check_stopped/1]).
+
+
 -export([
 	 ping/0,
 	 start_link/0
@@ -42,7 +44,6 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
-
 %%--------------------------------------------------------------------
 %% @doc
 %% git_update_repo
@@ -114,6 +115,7 @@ vm_check_stopped(Node) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec ping() -> pong.
+
 ping() ->
     gen_server:call(?SERVER,{ping},infinity).
 
@@ -146,8 +148,6 @@ start_link() ->
 	  ignore.
 init([]) ->
     process_flag(trap_exit, true),
-
-    
     {ok, #state{}}.
 
 %%--------------------------------------------------------------------
@@ -196,15 +196,13 @@ handle_call({vm_check_stopped,Node}, _From, State) ->
     Reply=lib_vm:check_stopped(Node),
     {reply, Reply, State};
 
-%%---------------  admin
 handle_call({ping}, _From, State) ->
-    Reply=cmn_server:ping(),
+    Reply = pong,
     {reply, Reply, State};
 
 handle_call(Request, _From, State) ->
     Reply = {error,["Unmatched signal ",Request]},
     {reply, Reply, State}.
-
 
 %%--------------------------------------------------------------------
 %% @private
@@ -231,8 +229,19 @@ handle_cast(_Request, State) ->
 	  {noreply, NewState :: term(), Timeout :: timeout()} |
 	  {noreply, NewState :: term(), hibernate} |
 	  {stop, Reason :: normal | term(), NewState :: term()}.
-handle_info(_Info, State) ->
+%%--------------------------------------------------------------------
+%% @doc
+%% Admin 
+%% @end
+%%--------------------------------------------------------------------
+handle_info({Pid,{ping}}, State) ->
+  Pid!{self(),pong},
+  {noreply, State};
+
+handle_info(Info, State) ->
+    ?LOG_WARNING("Unmatched signal",[Info]),
     {noreply, State}.
+
 
 %%--------------------------------------------------------------------
 %% @private

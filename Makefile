@@ -64,7 +64,6 @@ eunit:
 	#INFO: Starts the eunit testing .................
 	erl -pa test_ebin\
 	 -pa _build/default/lib/log/ebin\
-	 -pa _build/default/lib/api_$(appl)/ebin\
 	 -pa _build/default/lib/$(appl)/ebin\
 	 -sname eunit_node\
 	 -run $(m) start\

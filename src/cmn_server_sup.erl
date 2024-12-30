@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc api_cmn_server top level supervisor.
+%% @doc cmn_server top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(api_cmn_server_sup).
+-module(cmn_server_sup).
 
 -behaviour(supervisor).
 
@@ -30,9 +30,11 @@ init([]) ->
                  intensity => 0,
                  period => 1},
     ChildSpecs = [
-		  #{id => api_cmn_server,     
-		    start => {api_cmn_server,start_link,[]}}
+		 
+		  #{id => cmn_server,       
+		    start => {cmn_server,start_link,[]}}
 		 ],
+
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions
